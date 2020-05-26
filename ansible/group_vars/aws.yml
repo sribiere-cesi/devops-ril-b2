@@ -1,0 +1,26 @@
+---
+timezone: Europe/Paris
+
+ntp_servers:
+  - 0.amazon.pool.ntp.org iburst
+  - 1.amazon.pool.ntp.org iburst
+  - 2.amazon.pool.ntp.org iburst
+  - 3.amazon.pool.ntp.org iburst
+
+
+global_users:
+  sribiere:
+    ubuntu_groups: sudo
+    givenName:  Sebastien RIBIERE
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUZyGwuaGDz/gCr9Dz+H/2gbn+TUho41Kc0sU07wVJc1VwODG9ne0o6a78BwDSUrdYKXifrn9s47SOkoorWic7GWkYFr4UOyhmtHChJOib5GUxOolDEU5S2BlKAMy1yA912bVVSXJELjG15nZc8NieBEhoNYuklep0P10uZo93yXFEc7KbMpIywJBSe5eNrXbpdlKrKn+f2CdsczdW+FvQeJpB7RaDUMLZWaxA//txsRKoedfKnWY6n+PfO62heoH0MX8eNB8W4WYxSh5o3acZ0m4kjgyvnagcHN5d3KJk886HyWH2p3l7+slP8yc0XxNiNi3PAf+hAtZQPjVcIcGh sribiere@PC12266-BES"
+
+users_skeleton:
+  shell: /bin/bash
+  groups: ~
+  # created with:
+  # python3 -c 'import crypt; print(crypt.crypt("Password", crypt.mksalt()))'
+  unixPassword: "$6$zwjhMkZby7Y6VNAZ$UqAdnHyWwIJIB.BGgR/C11Em.6W1oEOTtP9UgKZo9QVKjcssct8w4kzQ.ckboSNwiSNfYiboUwgD2hq0GwxdX."
+  state: present
+
+aws_region: eu-west-3
+ansible_python_interpreter: /usr/bin/python3

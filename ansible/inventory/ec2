@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+
+import boto3
+import configparser
+import getopt
+import json
+import os
+import sys
+
+
+class Inventory:
+
+    inventory = {}
+    public = False
+
+    def __init__(self, instances, config):
+
+        if config.has_option('instance', 'public'):
+            self.public = config.getboolean('instance', 'public')
+
+        for instance in instances:
+            if instance.state['Name'] not in ['stopped', 'shutting-down', 'terminated']:
+                name = ''
+                group = ''
+                subdomain = ''
+                if (instance.tags):
+                    for tag in instance.tags:
+                        if tag['Key'] == 'Name':
+                            name = tag['Value']
+                        elif tag['Key'] == 'Env':
+                            group = tag['Value'].replace('-', '_')
+                            subdomain = tag['Value']
+                if (name != 'builder') & (name != 'delivery') & (name != 'builder-database'):
+                    self.add_child('aws', group)
+                    self.add_host(
+                        group,
+                        self.get_hostname(name, subdomain),
+                        self.get_vars(name, group, subdomain, instance)
+                    )
+
+    def get_hostname(self, name, subdomain):
+        return name
+
+    def get_address(self, instance):
+        return instance.public_ip_address \
+            if self.public else instance.private_ip_address
+
+    def get_vars(self, name, group, subdomain, instance):
+        return {
+            'ansible_host': self.get_address(instance),
+            'hostname': self.get_hostname(name, subdomain),
+            'instance': {
+                'private_ip_address': instance.private_ip_address
+            }
+        }
+
+    def get_group(self, name, vars=[]):
+        if name not in self.inventory:
+            self.inventory[name] = {}
+        return self.inventory[name]
+
+    def add_child(self, group_name, child):
+        group = self.get_group(group_name)
+        if 'children' not in group:
+            group['children'] = []
+        if child not in group['children']:
+            group['children'].append(child)
+
+    def add_host_vars(self, host, vars):
+        if '_meta' not in self.inventory:
+            self.inventory['_meta'] = {'hostvars': {}}
+        self.inventory['_meta']['hostvars'][host] = vars
+
+    def add_host(self, group_name, host, vars=[]):
+        group = self.get_group(group_name)
+        if 'hosts' not in group:
+            group['hosts'] = []
+        if host in group['hosts']:
+            raise Exception('Duplicated host {}'.format(host))
+        group['hosts'].append(host)
+        self.add_host_vars(host, vars)
+
+    def dumps(self, pretty=False):
+        if pretty:
+            return json.dumps(self.inventory, sort_keys=True, indent=2, separators=(',', ': '))
+        else:
+            return json.dumps(self.inventory)
+
+
+class HostInventory:
+
+    vars = {}
+
+    def __init__(self, hostname):
+        self.hostname = hostname
+
+    def dumps(self, pretty=False):
+        if pretty:
+            return json.dumps(self.vars, sort_keys=True, indent=2, separators=(',', ': '))
+        else:
+            return json.dumps(self.vars)
+
+
+def main(argv):
+
+    config = configparser.ConfigParser()
+    config.read(os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'ec2.ini')
+    )
+
+    try:
+        ec2 = boto3.resource('ec2')
+    except:
+        print('Error: Unable to create default session.', file=sys.stderr)
+        exit(1)
+
+    try:
+        opts, args = getopt.getopt(argv, 'plh:', ['pretty', 'list', 'host='])
+    except getopt.GetoptError as error:
+        print('Error: {}'.format(str(error)), file=sys.stderr)
+        exit(1)
+
+    pretty = False
+    action = None
+    for opt, arg in opts:
+        if opt in ('-p', '--pretty'):
+            pretty = True
+        elif opt in ('-l', '--list'):
+            action = 'list'
+        elif opt in ('-h', '--host'):
+            action = 'host'
+            host = arg
+    try:
+        if action == 'list':
+            print(Inventory(ec2.instances.all(), config).dumps(pretty))
+        elif action == 'host':
+            print(HostInventory(arg).dumps(pretty))
+        else:
+            raise Exception('Unknown action {}'.format(action))
+    except Exception as error:
+        print('Error: {}'.format(str(error)), file=sys.stderr)
+        exit(1)
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

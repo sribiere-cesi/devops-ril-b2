@@ -1,0 +1,27 @@
+---
+- name: install package
+  apt:
+    name: ntp
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: install package
+  yum:
+    name: ntp
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: enable service
+  service:
+    name: ntp
+    state: started
+    enabled: yes
+
+- name: generate /etc/ntp.conf
+  template:
+    src: etc/ntp.conf.j2
+    dest: /etc/ntp.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart ntp

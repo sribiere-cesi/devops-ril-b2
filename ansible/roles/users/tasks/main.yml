@@ -1,0 +1,74 @@
+---
+- name: Ensure group "integ" exists
+  group:
+    name: integ
+    state: present
+
+- name: Ensure group "oracle" exists
+  group:
+    name: oracle
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: manage users
+  user:
+    name: "{{item.key}}"
+    groups: "{{item.value.ubuntu_groups|default(users_skeleton.groups)}}"
+    append: yes
+    shell: "{{item.value.shell|default(users_skeleton.shell)}}"
+    password: "{{item.value.unixPassword|default(users_skeleton.password)}}"
+    comment: "{{item.value.comment|default(None)}}"
+    update_password: "{{item.value.update_password|default('always')}}"
+    state: "{{item.value.state|default('present')}}"
+    createhome: yes
+    remove: yes
+  with_dict: "{{users}}"
+  when: (item.value.ssh_key|default('')) != '' and ansible_os_family == "Debian"
+  tags: ['users']
+
+- name: manage users
+  user:
+    name: "{{item.key}}"
+    groups: "{{item.value.oracle_groups|default(users_skeleton.groups)}}"
+    append: yes
+    shell: "{{item.value.shell|default(users_skeleton.shell)}}"
+    password: "{{item.value.unixPassword|default(users_skeleton.password)}}"
+    comment: "{{item.value.comment|default(None)}}"
+    update_password: "{{item.value.update_password|default('always')}}"
+    state: "{{item.value.state|default('present')}}"
+    createhome: yes
+    remove: yes
+  with_dict: "{{users}}"
+  when: (item.value.ssh_key|default('')) != '' and ansible_os_family == "RedHat"
+  tags: ['users']
+
+- name: manage users without SSH key
+  user:
+    name: "{{item.key}}"
+    state: "absent"
+  with_dict: "{{users}}"
+  when: (item.value.ssh_key|default('')) == ''
+  tags: ['users']
+
+
+- name: authorize key for users
+  authorized_key:
+    user: "{{item.key}}"
+    key: "{{item.value.ssh_key|default('')}}"
+    state: "{{item.value.state|default('present')}}"
+  with_dict: "{{users}}"
+  when: (item.value.state|default('present'))!='absent' and (item.value.ssh_key|default('')) != ''
+  tags: ['users']
+
+
+- name: manage bash_profile
+  template:
+    src: bash_profile.j2
+    dest: "/home/{{item.key}}/.bash_profile"
+    mode: 0644
+    owner: "{{item.key}}"
+    group: "{{item.key}}"
+    force: yes
+  with_dict: "{{users}}"
+  when: (item.value.state|default('present'))!='absent' and (item.value.ssh_key|default('')) != '' and ansible_os_family == "RedHat"
+  tags: ['users']

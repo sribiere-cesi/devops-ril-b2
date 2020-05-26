@@ -1,0 +1,8 @@
+---
+dependencies:
+  - { role: hostname }
+  - { role: timezone }
+  - { role: apt }
+  - { role: ntp }
+  - { role: unzip }
+  - { role: sudoer_no_pwd }

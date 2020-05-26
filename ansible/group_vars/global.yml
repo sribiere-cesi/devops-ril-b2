@@ -1,0 +1,11 @@
+---
+users:
+  - "{{global_users}}"
+
+users_skeleton:
+  shell: /bin/bash
+  groups: ~
+  # created with:
+  # python3 -c 'import crypt; print(crypt.crypt("Password", crypt.mksalt()))'
+  password: "$6$zwjhMkZby7Y6VNAZ$UqAdnHyWwIJIB.BGgR/C11Em.6W1oEOTtP9UgKZo9QVKjcssct8w4kzQ.ckboSNwiSNfYiboUwgD2hq0GwxdX."
+  state: present

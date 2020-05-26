@@ -1,0 +1,12 @@
+---
+skeleton:
+  shell: /bin/bash
+  groups: ~
+  password: '!'
+  state: present
+users: []
+keys: []
+ansible_ORACLE_BASE: /ora01/app/oracle
+ansible_ORACLE_UNQNAME: ORA12C
+ansible_ORACLE_HOME: $ORACLE_BASE/product/12.1.0/db_1
+ansible_ORACLE_SID: orcl12c

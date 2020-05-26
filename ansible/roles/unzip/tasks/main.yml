@@ -1,0 +1,5 @@
+---
+- name: install package
+  apt:
+    name: unzip
+    state: present
