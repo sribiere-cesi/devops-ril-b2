@@ -11,7 +11,7 @@ variable "ami" {
 }
 
 variable "key_name" {
-  default = "deploy"
+  default = "deploy_bis"
 }
 
 variable "cidr_block" {
