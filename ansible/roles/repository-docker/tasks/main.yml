@@ -1,0 +1,12 @@
+---
+- name: setup {{ repository_docker_release }} repository key
+  apt_key:
+    url: "{{ repository_docker_key }}"
+    state: present
+
+- name: setup {{ repository_docker_release }} repository
+  apt_repository:
+    repo: "{{ repository_docker }}"
+    filename: docker
+    update_cache: yes
+    state: present

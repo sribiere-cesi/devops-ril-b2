@@ -1,0 +1,14 @@
+---
+- name: download binary {{docker_compose_url}}
+  get_url:
+    url: "{{docker_compose_url}}"
+    dest: "{{docker_compose_file}}-{{docker_compose_version}}"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: link {{docker_compose_file}}-{{docker_compose_version}} to {{docker_compose_file}}
+  file:
+    src: "{{docker_compose_file}}-{{docker_compose_version}}"
+    dest: "{{docker_compose_file}}"
+    state: link

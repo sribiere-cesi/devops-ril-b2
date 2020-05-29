@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+{% if docker_version %}
+Package: {{ docker_package_name }}
+Pin: version {{ docker_package_version }}
+Pin-Priority: 1001
+{% endif %}

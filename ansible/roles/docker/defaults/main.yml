@@ -1,0 +1,14 @@
+---
+docker_release: stable
+docker_version:
+docker_package_name: "docker-ce"
+docker_package_version: "{{ docker_version is version('19.03.8', '>=') | ternary('5:%s', '%s') | format(docker_version) }}"
+docker_package_full: "{{ '%s=%s' | format(docker_package_name, docker_package_version) }}"
+docker_package: "{{ docker_version | ternary(docker_package_full, docker_package_name) }}"
+docker_user: docker
+docker_group: docker
+docker_home: /var/lib/docker
+docker_daemon_options: --host unix:///var/run/docker.sock
+docker_daemon_config: {}
+docker_daemon_enabled: yes
+docker_users: []

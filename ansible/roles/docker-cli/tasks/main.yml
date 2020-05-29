@@ -1,0 +1,19 @@
+---
+- name: assert version
+  assert:
+    that:
+      - docker_cli_version is version('18.09', '>=')
+    msg: Package is available from version >= 18.09.0
+
+- name: generate apt preferences
+  template:
+    src: etc/apt/preferences.d/docker-cli.j2
+    dest: /etc/apt/preferences.d/docker-cli
+    mode: 0644
+
+- name: install package {{docker_cli_version | ternary(docker_cli_package_version, 'any version')}}
+  apt:
+    name: "{{ docker_cli_package }}"
+    update_cache: yes
+    cache_valid_time: 86400
+    state: present

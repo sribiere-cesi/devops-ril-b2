@@ -1,0 +1,95 @@
+---
+- name: remove conflicting packages
+  apt:
+    name: [lxd, lxd-client, lxc-common, lxcfs]
+    force: yes
+    purge: yes
+    state: absent
+
+- name: generate apt preferences
+  template:
+    src: etc/apt/preferences.d/docker.j2
+    dest: /etc/apt/preferences.d/docker
+    mode: 0644
+
+- name: install package {{docker_version | ternary(docker_package_version, 'any version')}}
+  apt:
+    name: "{{docker_package}}"
+    update_cache: yes
+    cache_valid_time: 86400
+    state: present
+
+# Generate systemd drop-in only if daemon.json contains hosts
+- name: create systemd drop-in path /etc/systemd/system/docker.service.d
+  file:
+    path: /etc/systemd/system/docker.service.d
+    mode: 0755
+    owner: root
+    group: root
+    state: directory
+  when: docker_daemon_config.hosts is defined
+
+- name: generate systemd drop-in /etc/systemd/system/docker.service.d/override.conf
+  template:
+    src: etc/systemd/system/docker.service.d/override.conf.j2
+    dest: /etc/systemd/system/docker.service.d/override.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: docker_systemd_dropin_create
+  when: docker_daemon_config.hosts is defined
+
+- name: remove systemd drop-in path /etc/systemd/system/docker.service.d/
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: absent
+  register: docker_systemd_dropin_remove
+  when: docker_daemon_config.hosts is undefined
+
+- name: reload systemd and restart service due to systemd drop-in change
+  systemd:
+    name: docker
+    state: restarted
+    daemon_reload: yes
+  when: docker_systemd_dropin_create is changed or docker_systemd_dropin_remove is changed
+
+- name: ensure configuration directory
+  file:
+    path: /etc/docker
+    owner: root
+    group: "{{ docker_group }}"
+    mode: 0750
+    state: directory
+
+- name: generate daemon configuration
+  copy:
+    dest: /etc/docker/daemon.json
+    content: "{{docker_daemon_config|to_nice_json}}"
+    owner: root
+    group: "{{ docker_group }}"
+    mode: 0640
+  register: docker_configuration
+  when: docker_daemon_config is defined
+
+- name: restart service deu to daemon configuration change
+  service:
+    name: docker
+    state: restarted
+  when: docker_configuration is changed
+
+- name: "{{docker_daemon_enabled|ternary('enable', 'disable')}} services"
+  systemd:
+    name: "docker.{{item}}"
+    state: "{{docker_daemon_enabled|ternary('started', 'stopped')}}"
+    enabled: "{{docker_daemon_enabled}}"
+  with_items: [socket, service]
+
+# ATTENTION: this task can potentially create new users!
+- name: add users to the docker group
+  user:
+    name: "{{item}}"
+    groups: "{{docker_group}}"
+    append: yes
+  with_items: "{{docker_users}}"
+  when: docker_users is defined
+  tags: [users]

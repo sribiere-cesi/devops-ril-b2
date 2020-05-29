@@ -1,0 +1,7 @@
+---
+docker_cli_release: "{{ docker_release | default('stable') }}"
+docker_cli_version: "{{ docker_version | default() }}"
+docker_cli_package_name: "docker-ce-cli"
+docker_cli_package_version: "{{ docker_cli_version is version('18.09', '>=') | ternary('5:%s', '%s') | format(docker_cli_version) }}"
+docker_cli_package_full: "{{ '%s=%s' | format(docker_cli_package_name, docker_cli_package_version) }}"
+docker_cli_package: "{{ docker_cli_version | ternary(docker_cli_package_full, docker_cli_package_name) }}"

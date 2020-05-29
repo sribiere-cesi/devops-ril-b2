@@ -1,0 +1,4 @@
+---
+dependencies:
+  - { role: repository-docker }
+  - { role: docker-cli }

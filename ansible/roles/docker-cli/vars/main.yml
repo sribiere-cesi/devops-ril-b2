@@ -1,0 +1,2 @@
+---
+repository_docker_release: "{{ docker_cli_release | default('stable') }}"

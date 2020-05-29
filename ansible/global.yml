@@ -25,4 +25,6 @@
   roles:
     - { role: common, tags: ['common'] }
     - { role: users, tags: ['users'] }
+    - { role: docker, tags: ['docker'] }
+    - { role: docker-compose, tags: ['docker-compose'] }
 
