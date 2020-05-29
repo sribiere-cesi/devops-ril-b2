@@ -68,7 +68,7 @@ global_users:
   jferreira:
     ubuntu_groups: sudo
     givenName:  James FERREIRA
-    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAzXQpMlM5W0Lh6sk8/zt6R6MHgnYkWdr85DlEEXi5DRp0jssRr7pnCcYPz8jf3EKsXsjIZ3DPF6Edslfoe6z+fM2cB7V/r0nFfBblnREviAh2J0ZcrkJQ6AyjNW2pfq8ltVEvxLVCAr/BU4n6+ok+Io0M9VGHx4VmTcjU9hnE9Ef7EBJ1TeUeyQv7QppfLaGT0T2noqatoKMpvb+XHycsMG3igo3kDPKDSRypPqZdepyF8dJ3AxlB0eVUShGa/s5MQn6X4AU/bkEU4buDHU3k+ZmwwonesKcRUo+ReRoyJKc5Vkl+HQiB5w4Y1fU96bNeKwiJ2ymgGHwoFoAa58j3YQ== rsa-key-20200527"
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAxbGhjyaw1ysfjGoaGhafGKEq93S5OGvxsmpkqn3MeXG4hXoWm1ql9X/7f1HX8DjUTH5X0j5cW7+oZFwW2DPCzBVrucOJBBlcSY9tRB8sm2xTwdri3S57y+6EPzYfgzPbeiREAVyCowCp+QPZwmqTtl0ZhHxkN9wHfsNJLk4Zcm7nwulqqV+nGBnRAsOP88gjNdk882Hik4AJf5NH9oKjikSyLY1RjhxS3LQ46IPNx560O9Q2C+nQt6kFWVwq9bQTs+BbVNAFECQtzBez5WijH/FcuvBBxiWEZncfuBsr2QiQoKF47Ngc1ENBR33UdlVloxrjKDoMzoZFKIepYhpmsw== rsa-key-20200527"
   npereira:
     ubuntu_groups: sudo
     givenName: Nicolas PEREIRA
