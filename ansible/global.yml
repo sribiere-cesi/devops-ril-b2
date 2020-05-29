@@ -22,6 +22,27 @@
   become: yes
   user: ubuntu
   ignore_errors: yes
+  vars:
+    docker_release: edge
+    docker_users:
+      - jboully
+      - qcordiero
+      - jrakic
+      - sbayon
+      - rchevallier
+      - athazet
+      - glefebvre
+      - lborel
+      - kdossantos
+      - fladouce
+      - afigueiredo
+      - dheliot
+      - rcouturier
+      - ytata
+      - amorin
+      - npereira
+      - svallet
+      - jferreira
   roles:
     - { role: common, tags: ['common'] }
     - { role: users, tags: ['users'] }
